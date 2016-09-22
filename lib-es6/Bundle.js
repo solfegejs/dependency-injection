@@ -121,7 +121,8 @@ export default class Bundle
             let serviceConfiguration = configuration.services[serviceId];
 
             // Class path is relative to configuration file if it exists
-            if (serviceConfiguration.class) {
+            // If the class path begins with "@", then it is an alias
+            if (serviceConfiguration.class && serviceConfiguration.class[0] !== "@") {
                 let directoryPath = path.dirname(filePath);
                 let classPath =  directoryPath + path.sep + serviceConfiguration.class;
 
