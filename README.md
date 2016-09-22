@@ -1,2 +1,6 @@
-# solfege-bundle-dependency-injection
+solfegejs-dependency-injection
+==============================
+
 Dependency Injection for SolfegeJS
+
+

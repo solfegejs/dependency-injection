@@ -125,10 +125,17 @@ export default class Bundle
                 let directoryPath = path.dirname(filePath);
                 let classPath =  directoryPath + path.sep + serviceConfiguration.class;
 
+                // Check if the class path is valid
                 try {
-                    let classConstructor = require(classPath);
+                    require.resolve(classPath);
                     serviceConfiguration.class = classPath;
                 } catch (error) {
+                    try {
+                        require.resolve(serviceConfiguration.class);
+                    } catch (error) {
+                        // The relative path or the original path didn't work
+                        throw new Error(`Service class not found: ${serviceId}`);
+                    }
                 }
             }
 
