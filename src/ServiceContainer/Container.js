@@ -5,7 +5,6 @@ import {fn as isGenerator} from "is-generator"
 import bindGenerator from "bind-generator"
 import Definition from "./Definition"
 import Reference from "./Reference"
-import type {ConfigurationInterface} from "solfegejs/interface"
 import type {ContainerInterface, DefinitionInterface} from "../../interface"
 
 /**
@@ -16,7 +15,7 @@ export default class Container implements ContainerInterface
     /**
      * Symfony configuration
      */
-    configuration:ConfigurationInterface;
+    configuration:any;
 
     /**
      * Definitions
@@ -51,7 +50,7 @@ export default class Container implements ContainerInterface
      *
      * @param   {Configuration}     configuration       Solfege configuration
      */
-    setConfiguration(configuration:ConfigurationInterface):void
+    setConfiguration(configuration:any):void
     {
         this.configuration = configuration;
     }
@@ -61,7 +60,7 @@ export default class Container implements ContainerInterface
      *
      * @return  {Configuration}     Solfege configuration
      */
-    getConfiguration():ConfigurationInterface
+    getConfiguration():any
     {
         return this.configuration;
     }
