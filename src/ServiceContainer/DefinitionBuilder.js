@@ -1,3 +1,4 @@
+/* @flow */
 import Definition from "./Definition";
 import Reference from "./Reference";
 
@@ -9,7 +10,7 @@ export default class DefinitionBuilder
     /**
      * Constructor
      */
-    constructor()
+    constructor():void
     {
     }
 
@@ -20,7 +21,7 @@ export default class DefinitionBuilder
      * @param   {Object}        configuration   Configuration
      * @return  {Definition}                    Service definition
      */
-    build(serviceId:string, configuration)
+    build(serviceId:string, configuration:Object):Definition
     {
         let definition = new Definition(serviceId);
 

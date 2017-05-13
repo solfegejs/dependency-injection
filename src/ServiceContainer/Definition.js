@@ -1,4 +1,5 @@
-import Reference from "./Reference";
+/* @flow */
+import type {ReferenceInterface} from "../../interface"
 
 /**
  * Service definition
@@ -6,19 +7,59 @@ import Reference from "./Reference";
 export default class Definition
 {
     /**
+     * Identifier
+     */
+    id:string;
+
+    /**
+     * Instance
+     */
+    instance:any;
+
+    /**
+     * Class path
+     */
+    classPath:string;
+
+    /**
+     * Class reference
+     */
+    classReference:ReferenceInterface;
+
+    /**
+     * Reference of the factory service
+     */
+    factoryServiceReference:ReferenceInterface;
+
+    /**
+     * Factory method name
+     */
+    factoryMethodName:string;
+
+    /**
+     * Arguments
+     */
+    arguments:Set<*>;
+
+    /**
+     * Tags
+     */
+    tags:Set<Object>;
+
+    /**
+     * Method calls
+     */
+    methodCalls:Set<Object>;
+
+    /**
      * Constructor
      *
      * @param   {String}    id      Service id
      */
-    constructor(id:string)
+    constructor(id:string):void
     {
         // Initialize properties
         this.id = id;
-        this.instance;
-        this.classPath;
-        this.classReference;
-        this.factoryServiceReference;
-        this.factoryMethodName;
         this.arguments = new Set();
         this.tags = new Set();
         this.methodCalls = new Set();
@@ -29,7 +70,7 @@ export default class Definition
      *
      * @return  {String}            Service id
      */
-    getId()
+    getId():string
     {
         return this.id;
     }
@@ -39,7 +80,7 @@ export default class Definition
      *
      * @param   {*}     service     Service instance
      */
-    setInstance(service)
+    setInstance(service:any):void
     {
         this.instance = service;
     }
@@ -49,7 +90,7 @@ export default class Definition
      *
      * @return  {*}                 Service instance
      */
-    getInstance()
+    getInstance():any
     {
         return this.instance;
     }
@@ -59,7 +100,7 @@ export default class Definition
      *
      * @param   {String}    path    Class path
      */
-    setClassPath(path:string)
+    setClassPath(path:string):void
     {
         this.classPath = path;
     }
@@ -69,7 +110,7 @@ export default class Definition
      *
      * @return  {String}            Class path
      */
-    getClassPath()
+    getClassPath():string
     {
         return this.classPath;
     }
@@ -79,7 +120,7 @@ export default class Definition
      *
      * @param   {Reference}     reference       Class reference
      */
-    setClassReference(reference:Reference)
+    setClassReference(reference:ReferenceInterface):void
     {
         this.classReference = reference;
     }
@@ -89,7 +130,7 @@ export default class Definition
      *
      * @return  {Reference}                     Class reference
      */
-    getClassReference()
+    getClassReference():ReferenceInterface
     {
         return this.classReference;
     }
@@ -100,7 +141,7 @@ export default class Definition
      * @param   {Reference}     serviceReference    Service reference
      * @param   {string}        methodName          Method name
      */
-    setFactory(serviceReference:Reference, methodName:string)
+    setFactory(serviceReference:ReferenceInterface, methodName:string):void
     {
         this.factoryServiceReference = serviceReference;
         this.factoryMethodName = methodName;
@@ -111,7 +152,7 @@ export default class Definition
      *
      * @return  {Reference}     Service reference
      */
-    getFactoryServiceReference()
+    getFactoryServiceReference():ReferenceInterface
     {
         return this.factoryServiceReference;
     }
@@ -121,7 +162,7 @@ export default class Definition
      *
      * @return  {string}        Method name
      */
-    getFactoryMethodName()
+    getFactoryMethodName():string
     {
         return this.factoryMethodName;
     }
@@ -131,7 +172,7 @@ export default class Definition
      *
      * @param   {*}     argument    Class constructor argument
      */
-    addArgument(argument)
+    addArgument(argument:*):void
     {
         this.arguments.add(argument);
     }
@@ -141,7 +182,7 @@ export default class Definition
      *
      * @return  {Set}               Class constructor arguments
      */
-    getArguments()
+    getArguments():Set<*>
     {
         return this.arguments;
     }
@@ -151,7 +192,7 @@ export default class Definition
      *
      * @param   {Object}    tag     Tag
      */
-    addTag(tag)
+    addTag(tag:Object)
     {
         this.tags.add(tag);
     }
@@ -161,7 +202,7 @@ export default class Definition
      *
      * @return  {Set}               Tags
      */
-    getTags()
+    getTags():Set<Object>
     {
         return this.tags;
     }
@@ -172,7 +213,7 @@ export default class Definition
      * @param   {String}    name        Method name
      * @param   {Array}     parameters  Method parameters
      */
-    addMethodCall(name, parameters:Array = [])
+    addMethodCall(name:string, parameters:Array<*> = [])
     {
         this.methodCalls.add({
             name: name,
@@ -185,7 +226,7 @@ export default class Definition
      *
      * @return  {Set}                   Method calls
      */
-    getMethodCalls()
+    getMethodCalls():Set<Object>
     {
         return this.methodCalls;
     }

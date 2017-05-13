@@ -1,24 +1,40 @@
-import path from "path";
-import fs from "co-fs";
-import configYaml from "config-yaml";
-import bindGenerator from "bind-generator";
-import {fn as isGenerator} from "is-generator";
-import Container from "./ServiceContainer/Container";
-import DefinitionBuilder from "./ServiceContainer/DefinitionBuilder";
+/* @flow */
+import path from "path"
+import fs from "co-fs"
+import configYaml from "config-yaml"
+import bindGenerator from "bind-generator"
+import {fn as isGenerator} from "is-generator"
+import Container from "./ServiceContainer/Container"
+import DefinitionBuilder from "./ServiceContainer/DefinitionBuilder"
+import type {BundleInterface} from "solfegejs/interface"
+import solfege from "solfegejs"
+const Application = solfege.Application;
 
 /**
  * Service container bundle
  */
-export default class Bundle
+export default class Bundle implements BundleInterface
 {
+    /**
+     * Solfege Application
+     */
+    application:Application;
+
+    /**
+     * Definition builder
+     */
+    definitionBuilder:DefinitionBuilder;
+
+    /**
+     * Service container
+     */
+    container:Container;
+
     /**
      * Constructor
      */
     constructor()
     {
-        // Declare application property
-        this.application;
-
         // Initialize the definition builder
         this.definitionBuilder = new DefinitionBuilder();
 
@@ -31,7 +47,7 @@ export default class Bundle
      *
      * @return  {String}        The bundle path
      */
-    getPath()
+    getPath():string
     {
         return __dirname;
     }
@@ -39,9 +55,9 @@ export default class Bundle
     /**
      * Initialize the bundle
      *
-     * @param   {solfegejs/kernel/Application}  application     Solfege application
+     * @param   {Application}  application     Solfege application
      */
-    *initialize(application)
+    *initialize(application:Application):*
     {
         this.application = application;
 
@@ -59,10 +75,10 @@ export default class Bundle
     /**
      * The configuration is loaded
      *
-     * @param   {solfegejs/kernel/Application}      application     Solfege application
-     * @param   {solfegejs/kernel/Configuration}    configuration   Solfege configuration
+     * @param   {Application}       application     Solfege application
+     * @param   {Configuration}     configuration   Solfege configuration
      */
-    *onConfigurationLoaded(application, configuration)
+    *onConfigurationLoaded(application:Application, configuration:any):*
     {
         this.container.setConfiguration(configuration);
     }
@@ -70,7 +86,7 @@ export default class Bundle
     /**
      * The bundles are initialized
      */
-    *onBundlesInitialized()
+    *onBundlesInitialized():*
     {
         let bundles = this.application.getBundles();
 
@@ -96,7 +112,7 @@ export default class Bundle
     /**
      * Boot the bundle
      */
-    *boot()
+    *boot():*
     {
         // Compile
         yield this.container.compile();
@@ -109,7 +125,7 @@ export default class Bundle
      *
      * @param   {String}    filePath    The file path
      */
-    *loadConfigurationFile(filePath:string)
+    *loadConfigurationFile(filePath:string):*
     {
         let configuration = configYaml(filePath, {encoding: "utf8"});
 

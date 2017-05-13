@@ -1,14 +1,22 @@
+/* @flow */
+import type {ReferenceInterface} from "../../interface"
+
 /**
  * Service reference
  */
-export default class Reference
+export default class Reference implements ReferenceInterface
 {
+    /**
+     * Identifier
+     */
+    id:string;
+
     /**
      * Constructor
      *
      * @param   {String}    id  Service id
      */
-    constructor(id)
+    constructor(id:string):void
     {
         this.id = id;
     }
@@ -18,7 +26,7 @@ export default class Reference
      *
      * @return  {String}        Service id
      */
-    getId()
+    getId():string
     {
         return this.id;
     }

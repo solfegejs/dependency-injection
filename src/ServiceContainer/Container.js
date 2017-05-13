@@ -1,23 +1,43 @@
-import assert from "assert";
-import Reflect from "harmony-reflect";
-import {fn as isGenerator} from "is-generator";
-import bindGenerator from "bind-generator";
-import Definition from "./Definition";
-import Reference from "./Reference";
+/* @flow */
+import assert from "assert"
+import Reflect from "harmony-reflect"
+import {fn as isGenerator} from "is-generator"
+import bindGenerator from "bind-generator"
+import Definition from "./Definition"
+import Reference from "./Reference"
+import type {ConfigurationInterface} from "solfegejs/interface"
+import type {ContainerInterface, DefinitionInterface} from "../../interface"
 
 /**
  * Service container
  */
-export default class Container
+export default class Container implements ContainerInterface
 {
+    /**
+     * Symfony configuration
+     */
+    configuration:ConfigurationInterface;
+
+    /**
+     * Definitions
+     */
+    definitions:Map<string,DefinitionInterface>;
+
+    /**
+     * Compilers
+     */
+    compilers:Set<*>;
+
+    /**
+     * Indicates that the container is compiled
+     */
+    compiled:boolean;
+
     /**
      * Constructor
      */
-    constructor()
+    constructor():void
     {
-        // Solfege configuration
-        this.configuration;
-
         // Initialize definitions
         this.definitions = new Map();
 
@@ -31,7 +51,7 @@ export default class Container
      *
      * @param   {Configuration}     configuration       Solfege configuration
      */
-    setConfiguration(configuration)
+    setConfiguration(configuration:ConfigurationInterface):void
     {
         this.configuration = configuration;
     }
@@ -41,7 +61,7 @@ export default class Container
      *
      * @return  {Configuration}     Solfege configuration
      */
-    getConfiguration()
+    getConfiguration():ConfigurationInterface
     {
         return this.configuration;
     }
@@ -52,7 +72,7 @@ export default class Container
      * @param   {String}        id              Service id
      * @param   {Definition}    definition      Service definition
      */
-    setDefinition(id:string, definition)
+    setDefinition(id:string, definition:DefinitionInterface):void
     {
         this.definitions.set(id, definition);
     }
@@ -63,11 +83,16 @@ export default class Container
      * @param   {String}        id              Service id
      * @return  {Definition}                    Service definition
      */
-    getDefinition(id:string)
+    getDefinition(id:string):DefinitionInterface
     {
+        if (!this.definitions.has(id)) {
+            throw new Error(`Service definition not found: ${id}`);
+        }
+
         let definition = this.definitions.get(id);
         assert.ok(definition instanceof Definition, `Service definition not found: ${id}`);
 
+        // $FlowFixMe: FLow does not understand that the definition exists
         return definition;
     }
 
@@ -76,7 +101,7 @@ export default class Container
      *
      * @return  {Map}       Definitions
      */
-    getDefinitions()
+    getDefinitions():Map<string, DefinitionInterface>
     {
         return this.definitions;
     }
@@ -88,7 +113,7 @@ export default class Container
      * @param   {*}             service     Service instance
      * @return  {Definition}                Serice definition
      */
-    register(id:string, service)
+    register(id:string, service:any):Definition
     {
         let definition = new Definition(id);
         definition.setInstance(service);
@@ -104,7 +129,7 @@ export default class Container
      * @param   {String}    id      Service id
      * @return  {Reference}         Service reference
      */
-    getReference(id:string)
+    getReference(id:string):Reference
     {
         let reference = new Reference(id);
 
@@ -116,7 +141,7 @@ export default class Container
      *
      * @param   {Object}    compiler    Compiler pass
      */
-    addCompilerPass(compiler)
+    addCompilerPass(compiler:any):void
     {
         assert.strictEqual(typeof compiler.process, 'function');
         assert.strictEqual(compiler.process.constructor.name, 'GeneratorFunction');
@@ -130,7 +155,7 @@ export default class Container
      * @param   {String}    tagName     Tag name
      * @return  {Array}                 Service ids
      */
-    findTaggedServiceIds(tagName:string)
+    findTaggedServiceIds(tagName:string):Array<string>
     {
         let ids = [];
 
@@ -155,7 +180,7 @@ export default class Container
     /**
      * Compile
      */
-    *compile()
+    *compile():*
     {
         // The container is compiled only once
         if (this.compiled) {
@@ -177,7 +202,7 @@ export default class Container
      * @param   {String}        id          Service id
      * @return  {*}                         Service instance
      */
-    *get(id:string)
+    *get(id:string):*
     {
         // The container must be compiled
         assert.ok(this.compiled, `Unable to get service "${id}", the container is not compiled`);
@@ -203,7 +228,7 @@ export default class Container
      * @param   {String}        id          Service id
      * @return  {String}                    Service class path
      */
-    *getServiceClassPath(id:string)
+    *getServiceClassPath(id:string):*
     {
         // The container must be compiled
         assert.ok(this.compiled, `Unable to get service "${id}", the container is not compiled`);
@@ -220,7 +245,7 @@ export default class Container
      * @param   {Definition}    definition  Service definition
      * @return  {String}                    Service class path
      */
-    *getDefinitionClassPath(definition:Definition)
+    *getDefinitionClassPath(definition:DefinitionInterface):*
     {
         let classPath = definition.getClassPath();
 
@@ -244,7 +269,7 @@ export default class Container
      * @param   {Definition}    definition      Service definition
      * @return  {*}                             Service instance
      */
-    *buildInstance(definition:Definition)
+    *buildInstance(definition:DefinitionInterface):*
     {
         let instance;
         let instanceArguments = definition.getArguments();
@@ -321,7 +346,7 @@ export default class Container
      * @param   {*}     parameter   The parameter
      * @return  {*}                 The resolved parameter
      */
-    *resolveParameter(parameter)
+    *resolveParameter(parameter:any):*
     {
         // If the parameter is a service reference, then return the service instance
         if (parameter instanceof Reference) {

@@ -1,0 +1,14 @@
+[ignore]
+;<PROJECT_ROOT>/node_modules/solfegejs/src
+
+[include]
+<PROJECT_ROOT>/src
+<PROJECT_ROOT>/example/src
+
+[libs]
+
+[options]
+all=false
+module.use_strict=true
+module.file_ext=.js
+module.ignore_non_literal_requires=true
