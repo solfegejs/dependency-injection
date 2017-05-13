@@ -1,7 +1,7 @@
 {
     "name": "solfegejs-dependency-injection",
     "description": "Dependency injection for SolfegeJS",
-    "version": "1.0.3",
+    "version": "1.0.6",
     "author": "neolao <contact@neolao.com>",
     "repository": "https://github.com/neolao/solfege-bundle-dependency-injection.git",
     "license": "MIT",
@@ -38,7 +38,7 @@
         "watch": "^1.0.2"
     },
     "scripts": {
-        "prepare": "npm run build",
+        "prepare": "npm build && npm test",
         "test": "mocha --harmony --compilers js:babel-core/register --require co-mocha --recursive --reporter spec --bail",
         "coverage": "nyc npm test",
         "coveralls": "nyc npm test && nyc report --reporter=text-lcov | coveralls",

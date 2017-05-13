@@ -6,19 +6,16 @@ import bindGenerator from "bind-generator"
 import {fn as isGenerator} from "is-generator"
 import Container from "./ServiceContainer/Container"
 import DefinitionBuilder from "./ServiceContainer/DefinitionBuilder"
-import type {BundleInterface} from "solfegejs/interface"
-import solfege from "solfegejs"
-const Application = solfege.Application;
 
 /**
  * Service container bundle
  */
-export default class Bundle implements BundleInterface
+export default class Bundle
 {
     /**
      * Solfege Application
      */
-    application:Application;
+    application:any;
 
     /**
      * Definition builder
@@ -57,7 +54,7 @@ export default class Bundle implements BundleInterface
      *
      * @param   {Application}  application     Solfege application
      */
-    *initialize(application:Application):*
+    *initialize(application:any):*
     {
         this.application = application;
 
@@ -78,7 +75,7 @@ export default class Bundle implements BundleInterface
      * @param   {Application}       application     Solfege application
      * @param   {Configuration}     configuration   Solfege configuration
      */
-    *onConfigurationLoaded(application:Application, configuration:any):*
+    *onConfigurationLoaded(application:any, configuration:any):*
     {
         this.container.setConfiguration(configuration);
     }
