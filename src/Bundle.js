@@ -54,7 +54,7 @@ export default class Bundle
      *
      * @param   {Application}  application     Solfege application
      */
-    *initialize(application:any):*
+    *initialize(application:any):Generator<void,void,void>
     {
         this.application = application;
 
@@ -127,7 +127,7 @@ export default class Bundle
         let configuration = configYaml(filePath, {encoding: "utf8"});
 
         // Parse the services
-        if (typeof configuration.services !== 'object') {
+        if (typeof configuration.services !== "object") {
             return;
         }
         for (let serviceId in configuration.services) {

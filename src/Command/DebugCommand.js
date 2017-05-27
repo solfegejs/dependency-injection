@@ -113,7 +113,7 @@ export default class DebugCommand
         console.info(colors.yellow("========"));
         console.info("");
         for (let [id, definition] of definitions) {
-            console.info(colors.green("ID   : ") + colors.bgBlack.cyan(`${definition.getId()}`));
+            console.info(colors.green("ID   : ") + colors.bgBlack.cyan(`${id}`));
             console.info(colors.green("Class: ") + definition.getClassPath());
             console.info("");
         }

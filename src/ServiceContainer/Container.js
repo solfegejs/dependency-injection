@@ -2,10 +2,9 @@
 import assert from "assert"
 import Reflect from "harmony-reflect"
 import {fn as isGenerator} from "is-generator"
-import bindGenerator from "bind-generator"
 import Definition from "./Definition"
 import Reference from "./Reference"
-import type {ContainerInterface, DefinitionInterface} from "../../interface"
+import type {ContainerInterface, ReferenceInterface, DefinitionInterface, CompilerPassInterface} from "../../interface"
 
 /**
  * Service container
@@ -25,7 +24,7 @@ export default class Container implements ContainerInterface
     /**
      * Compilers
      */
-    compilers:Set<*>;
+    compilers:Set<CompilerPassInterface>;
 
     /**
      * Indicates that the container is compiled
@@ -128,7 +127,7 @@ export default class Container implements ContainerInterface
      * @param   {String}    id      Service id
      * @return  {Reference}         Service reference
      */
-    getReference(id:string):Reference
+    getReference(id:string):ReferenceInterface
     {
         let reference = new Reference(id);
 
@@ -138,12 +137,12 @@ export default class Container implements ContainerInterface
     /**
      * Add a compiler pass
      *
-     * @param   {Object}    compiler    Compiler pass
+     * @param   {CompilerPassInterface}     compiler    Compiler pass
      */
-    addCompilerPass(compiler:any):void
+    addCompilerPass(compiler:CompilerPassInterface):void
     {
-        assert.strictEqual(typeof compiler.process, 'function');
-        assert.strictEqual(compiler.process.constructor.name, 'GeneratorFunction');
+        assert.strictEqual(typeof compiler.process, "function");
+        assert.strictEqual(compiler.process.constructor.name, "GeneratorFunction");
 
         this.compilers.add(compiler);
     }
@@ -227,13 +226,13 @@ export default class Container implements ContainerInterface
      * @param   {String}        id          Service id
      * @return  {String}                    Service class path
      */
-    *getServiceClassPath(id:string):*
+    *getServiceClassPath(id:string):Generator<*,string,*>
     {
         // The container must be compiled
         assert.ok(this.compiled, `Unable to get service "${id}", the container is not compiled`);
 
         // Get the definition
-        let definition = this.getDefinition(id);
+        let definition:DefinitionInterface = this.getDefinition(id);
 
         return yield this.getDefinitionClassPath(definition);
     }
@@ -244,9 +243,9 @@ export default class Container implements ContainerInterface
      * @param   {Definition}    definition  Service definition
      * @return  {String}                    Service class path
      */
-    *getDefinitionClassPath(definition:DefinitionInterface):*
+    *getDefinitionClassPath(definition:DefinitionInterface):Generator<*,string,*>
     {
-        let classPath = definition.getClassPath();
+        let classPath:string = definition.getClassPath();
 
         if (classPath) {
             return classPath;
@@ -254,8 +253,8 @@ export default class Container implements ContainerInterface
 
         let classReference = definition.getClassReference();
         if (classReference instanceof Reference) {
-            let classServiceId = classReference.getId();
-            let classDefinition = this.getDefinition(classServiceId);
+            let classServiceId:string = classReference.getId();
+            let classDefinition:DefinitionInterface = this.getDefinition(classServiceId);
             classPath = yield this.getDefinitionClassPath(classDefinition);
         }
 
@@ -268,7 +267,7 @@ export default class Container implements ContainerInterface
      * @param   {Definition}    definition      Service definition
      * @return  {*}                             Service instance
      */
-    *buildInstance(definition:DefinitionInterface):*
+    *buildInstance(definition:DefinitionInterface):Generator<*,*,*>
     {
         let instance;
         let instanceArguments = definition.getArguments();
@@ -345,7 +344,7 @@ export default class Container implements ContainerInterface
      * @param   {*}     parameter   The parameter
      * @return  {*}                 The resolved parameter
      */
-    *resolveParameter(parameter:any):*
+    *resolveParameter(parameter:any):Generator<*,*,*>
     {
         // If the parameter is a service reference, then return the service instance
         if (parameter instanceof Reference) {

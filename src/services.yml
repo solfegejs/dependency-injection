@@ -4,3 +4,4 @@ services:
         class: "Command/DebugCommand"
         tags:
             - { name: "solfege.console.command" }
+
