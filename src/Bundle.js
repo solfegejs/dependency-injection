@@ -1,21 +1,22 @@
 /* @flow */
 import path from "path"
-import fs from "co-fs"
+import fs from "fs"
 import configYaml from "config-yaml"
-import bindGenerator from "bind-generator"
-import {fn as isGenerator} from "is-generator"
 import Container from "./ServiceContainer/Container"
 import DefinitionBuilder from "./ServiceContainer/DefinitionBuilder"
+import type Application from "solfegejs/src/Application"
+import type Configuration from "solfegejs/src/Configuration"
+import type {BundleInterface} from "solfegejs/src/BundleInterface"
 
 /**
  * Service container bundle
  */
-export default class Bundle
+export default class Bundle implements BundleInterface
 {
     /**
      * Solfege Application
      */
-    application:any;
+    application:Application;
 
     /**
      * Definition builder
@@ -54,15 +55,18 @@ export default class Bundle
      *
      * @param   {Application}  application     Solfege application
      */
-    *initialize(application:any):Generator<void,void,void>
+    initialize(application:Application)
     {
         this.application = application;
 
+        // Add the container to the application parameters
+        this.application.setParameter("serviceContainer", this.container);
+
         // Listen the end of configuration loading
-        this.application.on("configuration_loaded", bindGenerator(this, this.onConfigurationLoaded));
+        this.application.on("configuration_loaded", this.onConfigurationLoaded.bind(this));
 
         // Listen the end of bundles initialization
-        this.application.on("bundles_initialized", bindGenerator(this, this.onBundlesInitialized));
+        this.application.on("bundles_initialized", this.onBundlesInitialized.bind(this));
 
         // The first service is the container itself
         let definition = this.container.register("container", this.container);
@@ -75,7 +79,7 @@ export default class Bundle
      * @param   {Application}       application     Solfege application
      * @param   {Configuration}     configuration   Solfege configuration
      */
-    *onConfigurationLoaded(application:any, configuration:any):*
+    onConfigurationLoaded(application:Application, configuration:Configuration)
     {
         this.container.setConfiguration(configuration);
     }
@@ -83,15 +87,15 @@ export default class Bundle
     /**
      * The bundles are initialized
      */
-    *onBundlesInitialized():*
+    async onBundlesInitialized()
     {
         let bundles = this.application.getBundles();
 
         // Load services from the bundles
         for (let bundle of bundles) {
             // If the bundle implements configureContainer method, then call it
-            if (isGenerator(bundle.configureContainer)) {
-                yield bundle.configureContainer(this.container);
+            if (typeof bundle.configureContainer === "function") {
+                await bundle.configureContainer(this.container);
             }
 
             // Otherwise, look at the default configuration file
@@ -100,8 +104,8 @@ export default class Bundle
                 throw new Error("Unable to find bundle directory path");
             }
             let configurationFile = `${bundlePath}${path.sep}services.yml`;
-            if (yield fs.exists(configurationFile)) {
-                yield this.loadConfigurationFile(configurationFile);
+            if (await fs.exists(configurationFile)) {
+                this.loadConfigurationFile(configurationFile);
             }
         }
     }
@@ -109,10 +113,10 @@ export default class Bundle
     /**
      * Boot the bundle
      */
-    *boot():*
+    async boot()
     {
         // Compile
-        yield this.container.compile();
+        await this.container.compile();
 
         // The container is ready
     }
@@ -122,7 +126,7 @@ export default class Bundle
      *
      * @param   {String}    filePath    The file path
      */
-    *loadConfigurationFile(filePath:string):*
+    loadConfigurationFile(filePath:string)
     {
         let configuration = configYaml(filePath, {encoding: "utf8"});
 

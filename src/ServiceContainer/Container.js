@@ -1,7 +1,6 @@
 /* @flow */
 import assert from "assert"
 import Reflect from "harmony-reflect"
-import {fn as isGenerator} from "is-generator"
 import Definition from "./Definition"
 import Reference from "./Reference"
 import type {ContainerInterface, ReferenceInterface, DefinitionInterface, CompilerPassInterface} from "../../interface"
@@ -178,7 +177,7 @@ export default class Container implements ContainerInterface
     /**
      * Compile
      */
-    *compile():*
+    async compile():*
     {
         // The container is compiled only once
         if (this.compiled) {
@@ -187,7 +186,7 @@ export default class Container implements ContainerInterface
 
         // Process each compiler pass
         for (let compiler of this.compilers) {
-            yield compiler.process(this);
+            await compiler.process(this);
         }
 
         // The container is compiled
@@ -200,7 +199,7 @@ export default class Container implements ContainerInterface
      * @param   {String}        id          Service id
      * @return  {*}                         Service instance
      */
-    *get(id:string):*
+    async get(id:string):*
     {
         // The container must be compiled
         assert.ok(this.compiled, `Unable to get service "${id}", the container is not compiled`);
@@ -215,7 +214,7 @@ export default class Container implements ContainerInterface
         }
 
         // Build the instance
-        instance = yield this.buildInstance(definition);
+        instance = await this.buildInstance(definition);
         return instance;
     }
 
@@ -226,7 +225,7 @@ export default class Container implements ContainerInterface
      * @param   {String}        id          Service id
      * @return  {String}                    Service class path
      */
-    *getServiceClassPath(id:string):Generator<*,string,*>
+    async getServiceClassPath(id:string):Promise<string>
     {
         // The container must be compiled
         assert.ok(this.compiled, `Unable to get service "${id}", the container is not compiled`);
@@ -234,7 +233,7 @@ export default class Container implements ContainerInterface
         // Get the definition
         let definition:DefinitionInterface = this.getDefinition(id);
 
-        return yield this.getDefinitionClassPath(definition);
+        return await this.getDefinitionClassPath(definition);
     }
 
     /**
@@ -243,7 +242,7 @@ export default class Container implements ContainerInterface
      * @param   {Definition}    definition  Service definition
      * @return  {String}                    Service class path
      */
-    *getDefinitionClassPath(definition:DefinitionInterface):Generator<*,string,*>
+    async getDefinitionClassPath(definition:DefinitionInterface):Promise<string>
     {
         let classPath:string = definition.getClassPath();
 
@@ -255,7 +254,7 @@ export default class Container implements ContainerInterface
         if (classReference instanceof Reference) {
             let classServiceId:string = classReference.getId();
             let classDefinition:DefinitionInterface = this.getDefinition(classServiceId);
-            classPath = yield this.getDefinitionClassPath(classDefinition);
+            classPath = await this.getDefinitionClassPath(classDefinition);
         }
 
         return classPath;
@@ -267,7 +266,7 @@ export default class Container implements ContainerInterface
      * @param   {Definition}    definition      Service definition
      * @return  {*}                             Service instance
      */
-    *buildInstance(definition:DefinitionInterface):Generator<*,*,*>
+    async buildInstance(definition:DefinitionInterface):Promise<*>
     {
         let instance;
         let instanceArguments = definition.getArguments();
@@ -275,12 +274,12 @@ export default class Container implements ContainerInterface
         // Resolve arguments
         let instanceArgumentsResolved = [];
         for (let instanceArgument of instanceArguments) {
-            let instanceArgumentResolved = yield this.resolveParameter(instanceArgument);
+            let instanceArgumentResolved = await this.resolveParameter(instanceArgument);
             instanceArgumentsResolved.push(instanceArgumentResolved);
         }
 
         // Instantiate with a class
-        let classPath = yield this.getDefinitionClassPath(definition);
+        let classPath = await this.getDefinitionClassPath(definition);
         if (typeof classPath === "string") {
             try {
                 let classObject = require(classPath);
@@ -294,14 +293,12 @@ export default class Container implements ContainerInterface
         let factoryServiceReference = definition.getFactoryServiceReference();
         if (!instance && factoryServiceReference instanceof Reference) {
             let factoryServiceId = factoryServiceReference.getId();
-            let factoryService = yield this.get(factoryServiceId);
+            let factoryService = await this.get(factoryServiceId);
             let factoryMethodName = definition.getFactoryMethodName();
             let factoryMethod = factoryService[factoryMethodName];
 
-            if (isGenerator(factoryMethod)) {
-                instance = yield factoryMethod.apply(factoryService, instanceArgumentsResolved);
-            } else if (typeof factoryMethod === "function") {
-                instance = factoryMethod.apply(factoryService, instanceArgumentsResolved);
+            if (typeof factoryMethod === "function") {
+                instance = await factoryMethod.apply(factoryService, instanceArgumentsResolved);
             } else {
                 throw new Error(`Factory method must be a function: service ${definition.getId()}`);
             }
@@ -323,16 +320,12 @@ export default class Container implements ContainerInterface
             // Resolve parameters
             let parametersResolved = []
             for (let parameter of parameters) {
-                let parameterResolved = yield this.resolveParameter(parameter);
+                let parameterResolved = await this.resolveParameter(parameter);
                 parametersResolved.push(parameterResolved);
             }
 
             // Call the method
-            if (isGenerator(method)) {
-                yield method.apply(instance, parametersResolved);
-            } else {
-                method.apply(instance, parametersResolved);
-            }
+            await method.apply(instance, parametersResolved);
         }
 
         return instance;
@@ -344,12 +337,12 @@ export default class Container implements ContainerInterface
      * @param   {*}     parameter   The parameter
      * @return  {*}                 The resolved parameter
      */
-    *resolveParameter(parameter:any):Generator<*,*,*>
+    async resolveParameter(parameter:any):Promise<*>
     {
         // If the parameter is a service reference, then return the service instance
         if (parameter instanceof Reference) {
             let serviceId = parameter.getId();
-            let service = yield this.get(serviceId);
+            let service = await this.get(serviceId);
             return service;
         }
 
@@ -361,7 +354,7 @@ export default class Container implements ContainerInterface
         // If the parameter is a service reference in string format, then return the serviec instance
         if (parameter[0] === "@") {
             let serviceId = parameter.substr(1);
-            let service = yield this.get(serviceId);
+            let service = await this.get(serviceId);
             return service;
         }
 

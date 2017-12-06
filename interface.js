@@ -207,7 +207,7 @@ export interface ContainerInterface
      * @param   {String}        id          Service id
      * @return  {String}                    Service class path
      */
-    getServiceClassPath(id:string):Generator<*,string,*>;
+    getServiceClassPath(id:string):Promise<string>;
 
     /**
      * Get definition class path
@@ -215,7 +215,7 @@ export interface ContainerInterface
      * @param   {Definition}    definition  Service definition
      * @return  {String}                    Service class path
      */
-    getDefinitionClassPath(definition:DefinitionInterface):Generator<*,string,*>;
+    getDefinitionClassPath(definition:DefinitionInterface):Promise<string>;
 
     /**
      * Build definition instance
@@ -223,7 +223,7 @@ export interface ContainerInterface
      * @param   {Definition}    definition      Service definition
      * @return  {*}                             Service instance
      */
-    buildInstance(definition:DefinitionInterface):Generator<*,*,*>;
+    buildInstance(definition:DefinitionInterface):*;
 
     /**
      * Resolve a parameter
@@ -231,7 +231,7 @@ export interface ContainerInterface
      * @param   {*}     parameter   The parameter
      * @return  {*}                 The resolved parameter
      */
-    resolveParameter(parameter:any):Generator<*,*,*>;
+    resolveParameter(parameter:any):*;
 }
 
 /**
@@ -244,7 +244,7 @@ export interface CompilerPassInterface
      *
      * @param   {ContainerInterface}    container   Container
      */
-    process(container:ContainerInterface):Generator<*,*,*>;
+    process(container:ContainerInterface):*;
 }
 
 
