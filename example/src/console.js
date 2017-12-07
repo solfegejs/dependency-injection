@@ -1,9 +1,9 @@
-import solfege from "solfegejs"
+import Application from "solfegejs-application"
 import DIBundle from "../../lib/Bundle"
 import MyBundle from "./Bundle";
 
 // Create application instance
-let application = new solfege.Application;
+let application = new Application;
 application.addBundle(new DIBundle);
 application.addBundle(new MyBundle);
 

@@ -4,9 +4,9 @@ import fs from "fs"
 import configYaml from "config-yaml"
 import Container from "./ServiceContainer/Container"
 import DefinitionBuilder from "./ServiceContainer/DefinitionBuilder"
-import type Application from "solfegejs/src/Application"
-import type Configuration from "solfegejs/src/Configuration"
-import type {BundleInterface} from "solfegejs/src/BundleInterface"
+import type Application from "solfegejs-application/src/Application"
+import type Configuration from "solfegejs-application/src/Configuration"
+import type {BundleInterface} from "solfegejs-application/src/BundleInterface"
 
 /**
  * Service container bundle

@@ -1,6 +1,6 @@
 /* @flow */
-import type Application from "solfegejs/src/Application"
-import type {BundleInterface, InitializableBundleInterface} from "solfegejs/src/BundleInterface"
+import type Application from "solfegejs-application/src/Application"
+import type {BundleInterface, InitializableBundleInterface} from "solfegejs-application/src/BundleInterface"
 
 /**
  * Example bundle
