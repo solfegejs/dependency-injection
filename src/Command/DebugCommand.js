@@ -95,7 +95,7 @@ export default class DebugCommand
     /**
      * Configure command
      */
-    *configure():*
+    async configure()
     {
         this.setName("dependency-injection:debug");
         this.setDescription("Debug dependency injection");
@@ -104,7 +104,7 @@ export default class DebugCommand
     /**
      * Execute the command
      */
-    *execute():*
+    async execute()
     {
         let container = this.getContainer();
         let definitions = container.getDefinitions();
