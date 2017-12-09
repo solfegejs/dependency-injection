@@ -140,8 +140,7 @@ export default class Container implements ContainerInterface
      */
     addCompilerPass(compiler:CompilerPassInterface):void
     {
-        assert.strictEqual(typeof compiler.process, "function");
-        assert.strictEqual(compiler.process.constructor.name, "GeneratorFunction");
+        assert.strictEqual(typeof compiler.process, "function", "Compiler pass should contain process function");
 
         this.compilers.add(compiler);
     }
