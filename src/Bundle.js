@@ -98,13 +98,13 @@ export default class Bundle implements BundleInterface
                 await bundle.configureContainer(this.container);
             }
 
-            // Otherwise, look at the default configuration file
+            // Look at the default configuration file
             let bundlePath = this.application.getBundleDirectoryPath(bundle);
             if (!bundlePath) {
                 throw new Error("Unable to find bundle directory path");
             }
             let configurationFile = `${bundlePath}${path.sep}services.yml`;
-            if (await fs.exists(configurationFile)) {
+            if (fs.existsSync(configurationFile)) {
                 this.loadConfigurationFile(configurationFile);
             }
         }

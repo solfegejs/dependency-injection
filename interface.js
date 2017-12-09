@@ -247,4 +247,15 @@ export interface CompilerPassInterface
     process(container:ContainerInterface):*;
 }
 
-
+/**
+ * A bundle that implement this interface can configure the service container
+ */
+export interface ContainerConfiguratorBundleInterface
+{
+    /**
+     * Configure the service container
+     *
+     * @param   {ContainerInterface}    container   Container
+     */
+    configureContainer(container:ContainerInterface):void;
+}
