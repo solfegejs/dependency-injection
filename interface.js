@@ -244,7 +244,7 @@ export interface CompilerPassInterface
      *
      * @param   {ContainerInterface}    container   Container
      */
-    process(container:ContainerInterface):*;
+    process(container:ContainerInterface):void | Promise<void>;
 }
 
 /**
@@ -257,5 +257,5 @@ export interface ContainerConfiguratorBundleInterface
      *
      * @param   {ContainerInterface}    container   Container
      */
-    configureContainer(container:ContainerInterface):void;
+    configureContainer(container:ContainerInterface):void | Promise<void>;
 }
