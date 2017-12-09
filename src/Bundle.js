@@ -95,7 +95,11 @@ export default class Bundle implements BundleInterface
         for (let bundle of bundles) {
             // If the bundle implements configureContainer method, then call it
             if (typeof bundle.configureContainer === "function") {
-                await bundle.configureContainer(this.container);
+                if (bundle.configureContainer.constructor.name === "AsyncFunction") {
+                    await bundle.configureContainer(this.container);
+                } else {
+                    bundle.configureContainer(this.container);
+                }
             }
 
             // Look at the default configuration file
