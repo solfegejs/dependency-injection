@@ -1,6 +1,5 @@
 /* @flow */
 import assert from "assert"
-import Reflect from "harmony-reflect"
 import Definition from "./Definition"
 import Reference from "./Reference"
 import type {ContainerInterface, ReferenceInterface, DefinitionInterface, CompilerPassInterface} from "../../interface"
@@ -185,7 +184,14 @@ export default class Container implements ContainerInterface
 
         // Process each compiler pass
         for (let compiler of this.compilers) {
-            await compiler.process(this);
+            if (typeof compiler.process !== "function") {
+                continue;
+            }
+            if (compiler.process.constructor.name === "AsyncFunction") {
+                await compiler.process(this);
+            } else {
+                compiler.process(this);
+            }
         }
 
         // The container is compiled
@@ -282,6 +288,13 @@ export default class Container implements ContainerInterface
         if (typeof classPath === "string") {
             try {
                 let classObject = require(classPath);
+                if (typeof classObject !== "function" && typeof classObject.default === "function") {
+                    classObject = classObject.default;
+                }
+                if (typeof classObject !== "function") {
+                    throw new Error(`No class found in "${classPath}"`);
+                }
+
                 instance = Reflect.construct(classObject, instanceArgumentsResolved);
             } catch (error) {
                 throw new Error(`Unable to instantiate service "${classPath}": ${error.message}`);
@@ -324,7 +337,11 @@ export default class Container implements ContainerInterface
             }
 
             // Call the method
-            await method.apply(instance, parametersResolved);
+            if (method.constructor.name === "AsyncFunction") {
+                await method.apply(instance, parametersResolved);
+            } else {
+                method.apply(instance, parametersResolved);
+            }
         }
 
         return instance;
