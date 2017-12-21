@@ -3,6 +3,7 @@ import assert from "assert"
 import Definition from "./Definition"
 import Reference from "./Reference"
 import type {ContainerInterface, ReferenceInterface, DefinitionInterface, CompilerPassInterface} from "../../interface"
+import {bind} from "decko"
 
 /**
  * Service container
@@ -47,6 +48,7 @@ export default class Container implements ContainerInterface
      *
      * @param   {Configuration}     configuration       Solfege configuration
      */
+    @bind
     setConfiguration(configuration:any):void
     {
         this.configuration = configuration;
@@ -57,6 +59,7 @@ export default class Container implements ContainerInterface
      *
      * @return  {Configuration}     Solfege configuration
      */
+    @bind
     getConfiguration():any
     {
         return this.configuration;
@@ -68,6 +71,7 @@ export default class Container implements ContainerInterface
      * @param   {String}        id              Service id
      * @param   {Definition}    definition      Service definition
      */
+    @bind
     setDefinition(id:string, definition:DefinitionInterface):void
     {
         this.definitions.set(id, definition);
@@ -79,6 +83,7 @@ export default class Container implements ContainerInterface
      * @param   {String}        id              Service id
      * @return  {Definition}                    Service definition
      */
+    @bind
     getDefinition(id:string):DefinitionInterface
     {
         if (!this.definitions.has(id)) {
@@ -97,6 +102,7 @@ export default class Container implements ContainerInterface
      *
      * @return  {Map}       Definitions
      */
+    @bind
     getDefinitions():Map<string, DefinitionInterface>
     {
         return this.definitions;
@@ -109,6 +115,7 @@ export default class Container implements ContainerInterface
      * @param   {*}             service     Service instance
      * @return  {Definition}                Serice definition
      */
+    @bind
     register(id:string, service:any):Definition
     {
         let definition = new Definition(id);
@@ -125,6 +132,7 @@ export default class Container implements ContainerInterface
      * @param   {String}    id      Service id
      * @return  {Reference}         Service reference
      */
+    @bind
     getReference(id:string):ReferenceInterface
     {
         let reference = new Reference(id);
@@ -137,6 +145,7 @@ export default class Container implements ContainerInterface
      *
      * @param   {CompilerPassInterface}     compiler    Compiler pass
      */
+    @bind
     addCompilerPass(compiler:CompilerPassInterface):void
     {
         assert.strictEqual(typeof compiler.process, "function", "Compiler pass should contain process function");
@@ -150,6 +159,7 @@ export default class Container implements ContainerInterface
      * @param   {String}    tagName     Tag name
      * @return  {Array}                 Service ids
      */
+    @bind
     findTaggedServiceIds(tagName:string):Array<string>
     {
         let ids = [];
@@ -175,6 +185,7 @@ export default class Container implements ContainerInterface
     /**
      * Compile
      */
+    @bind
     async compile():*
     {
         // The container is compiled only once
@@ -204,6 +215,7 @@ export default class Container implements ContainerInterface
      * @param   {String}        id          Service id
      * @return  {*}                         Service instance
      */
+    @bind
     async get(id:string):*
     {
         // The container must be compiled
@@ -230,6 +242,7 @@ export default class Container implements ContainerInterface
      * @param   {String}        id          Service id
      * @return  {String}                    Service class path
      */
+    @bind
     async getServiceClassPath(id:string):Promise<string>
     {
         // The container must be compiled
@@ -247,6 +260,7 @@ export default class Container implements ContainerInterface
      * @param   {Definition}    definition  Service definition
      * @return  {String}                    Service class path
      */
+    @bind
     async getDefinitionClassPath(definition:DefinitionInterface):Promise<string>
     {
         let classPath:string = definition.getClassPath();
@@ -271,6 +285,7 @@ export default class Container implements ContainerInterface
      * @param   {Definition}    definition      Service definition
      * @return  {*}                             Service instance
      */
+    @bind
     async buildInstance(definition:DefinitionInterface):Promise<*>
     {
         let instance;
@@ -353,6 +368,7 @@ export default class Container implements ContainerInterface
      * @param   {*}     parameter   The parameter
      * @return  {*}                 The resolved parameter
      */
+    @bind
     async resolveParameter(parameter:any):Promise<*>
     {
         // If the parameter is a service reference, then return the service instance

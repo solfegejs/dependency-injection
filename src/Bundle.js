@@ -5,19 +5,14 @@ import configYaml from "config-yaml"
 import Container from "./ServiceContainer/Container"
 import DefinitionBuilder from "./ServiceContainer/DefinitionBuilder"
 import type Application from "solfegejs-application/src/Application"
-import type Configuration from "solfegejs-application/src/Configuration"
 import type {BundleInterface} from "solfegejs-application/src/BundleInterface"
+import {bind} from "decko"
 
 /**
  * Service container bundle
  */
 export default class Bundle implements BundleInterface
 {
-    /**
-     * Solfege Application
-     */
-    application:Application;
-
     /**
      * Definition builder
      */
@@ -55,18 +50,14 @@ export default class Bundle implements BundleInterface
      *
      * @param   {Application}  application     Solfege application
      */
+    @bind
     initialize(application:Application)
     {
-        this.application = application;
-
         // Add the container to the application parameters
-        this.application.setParameter("serviceContainer", this.container);
-
-        // Listen the end of configuration loading
-        this.application.on("configuration_loaded", this.onConfigurationLoaded.bind(this));
+        application.setParameter("serviceContainer", this.container);
 
         // Listen the end of bundles initialization
-        this.application.on("bundles_initialized", this.onBundlesInitialized.bind(this));
+        application.on("bundles_initialized", this.onBundlesInitialized);
 
         // The first service is the container itself
         let definition = this.container.register("container", this.container);
@@ -74,22 +65,19 @@ export default class Bundle implements BundleInterface
     }
 
     /**
-     * The configuration is loaded
-     *
-     * @param   {Application}       application     Solfege application
-     * @param   {Configuration}     configuration   Solfege configuration
-     */
-    onConfigurationLoaded(application:Application, configuration:Configuration)
-    {
-        this.container.setConfiguration(configuration);
-    }
-
-    /**
      * The bundles are initialized
+     *
+     * @param   {Application}   application     Solfege application
      */
-    async onBundlesInitialized()
+    @bind
+    async onBundlesInitialized(application:Application)
     {
-        let bundles = this.application.getBundles();
+        let configuration = application.getParameter("configuration");
+        if (configuration) {
+            this.container.setConfiguration(configuration);
+        }
+
+        let bundles = application.getBundles();
 
         // Load services from the bundles
         for (let bundle of bundles) {
@@ -103,7 +91,7 @@ export default class Bundle implements BundleInterface
             }
 
             // Look at the default configuration file
-            let bundlePath = this.application.getBundleDirectoryPath(bundle);
+            let bundlePath = application.getBundleDirectoryPath(bundle);
             if (!bundlePath) {
                 throw new Error("Unable to find bundle directory path");
             }
@@ -117,6 +105,7 @@ export default class Bundle implements BundleInterface
     /**
      * Boot the bundle
      */
+    @bind
     async boot()
     {
         // Compile
@@ -130,6 +119,7 @@ export default class Bundle implements BundleInterface
      *
      * @param   {String}    filePath    The file path
      */
+    @bind
     loadConfigurationFile(filePath:string)
     {
         let configuration = configYaml(filePath, {encoding: "utf8"});
