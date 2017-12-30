@@ -391,8 +391,11 @@ export default class Container implements ContainerInterface
         }
 
         // Replace configuration properties
-        let resolvedParameter = this.configuration.resolvePropertyValue(parameter);
+        if (this.configuration && typeof this.configuration.resolvePropertyValue === "function") {
+            let resolvedParameter = this.configuration.resolvePropertyValue(parameter);
+            return resolvedParameter;
+        }
 
-        return resolvedParameter;
+        return parameter;
     }
 }
