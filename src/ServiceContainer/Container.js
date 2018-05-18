@@ -359,6 +359,8 @@ export default class Container implements ContainerInterface
             }
         }
 
+        definition.setInstance(instance);
+
         return instance;
     }
 

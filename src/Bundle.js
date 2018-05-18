@@ -82,6 +82,7 @@ export default class Bundle implements BundleInterface
         // Load services from the bundles
         for (let bundle of bundles) {
             // If the bundle implements configureContainer method, then call it
+            // $FlowFixMe
             if (typeof bundle.configureContainer === "function") {
                 if (bundle.configureContainer.constructor.name === "AsyncFunction") {
                     await bundle.configureContainer(this.container);
