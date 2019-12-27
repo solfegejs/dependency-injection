@@ -1,7 +1,7 @@
 {
   "name": "@solfege/dependency-injection",
   "description": "Dependency injection for SolfegeJS",
-  "version": "3.0.4",
+  "version": "3.0.5",
   "publishConfig": {
     "access": "public"
   },
