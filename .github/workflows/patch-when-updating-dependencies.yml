@@ -2,7 +2,7 @@ name: Patch when updating dependencies
 
 on:
   pull_request:
-    types: [closed] 
+    types: [closed]
 
 jobs:
   build:
@@ -11,7 +11,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v1.0.0
-        
+
       - name: Patch version
         run: git config --global user.email "support@github.com" && git config --global user.name "dependabot" && npm version patch
 
@@ -24,12 +24,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Publish package to NPM
-        run: npm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-
       - name: Git push
         run: git push origin HEAD:$GITHUB_REF
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish package to NPM
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
