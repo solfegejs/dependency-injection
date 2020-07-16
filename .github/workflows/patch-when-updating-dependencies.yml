@@ -12,8 +12,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v1.0.0
 
+      - name: set remote url
+        run: |
+          git remote set-url --push origin https://$GITHUB_ACTOR:${{ secrets.GITHUB_TOKEN }}@github.com/$GITHUB_REPOSITORY
+          git checkout "$GITHUB_REF"
+          
       - name: Patch version
-        run: git config --global user.email "support@github.com" && git config --global user.name "dependabot" && npm version patch
+        run: |
+          git config --global user.email "contact@neolao.com"
+          git config --global user.name "$GITHUB_ACTOR"
+          npm version patch
 
       - name: Set up Node.js for NPM
         uses: actions/setup-node@v1.2.0
@@ -25,7 +33,9 @@ jobs:
         run: npm ci
 
       - name: Git push
-        run: git push origin HEAD:$GITHUB_REF
+        run: |
+          git push origin
+          git push origin --tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
